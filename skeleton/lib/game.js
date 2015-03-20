@@ -1,6 +1,7 @@
 var readline = require("readline");
 var Piece = require("./piece.js");
 var Board = require("./board.js");
+var colors = require('colors');
 
 /**
  * Sets up the game with a board and the first player to play a turn.
@@ -8,13 +9,13 @@ var Board = require("./board.js");
 function Game () {
   this.board = new Board();
   this.turn = "black";
-};
+}
 
 /**
  * Flips the current turn to the opposite color.
  */
 Game.prototype._flipTurn = function () {
-  this.turn = (this.turn == "black") ? "white" : "black";
+  this.turn = (this.turn === "black") ? "white" : "black";
 };
 
 // Dreaded global state!
@@ -26,7 +27,8 @@ var rlInterface;
 Game.prototype.play = function () {
   rlInterface = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    terminal: false
   });
 
   this.runLoop(function () {
@@ -42,7 +44,7 @@ Game.prototype.play = function () {
 Game.prototype.playTurn = function (callback) {
   this.board.print();
   rlInterface.question(
-    this.turn + ", where do you want to move?",
+    this.turn + ", where do you want to move?\n",
     handleResponse.bind(this)
   );
 
@@ -50,7 +52,7 @@ Game.prototype.playTurn = function (callback) {
     var pos = JSON.parse(answer);
     if (!this.board.validMove(pos, this.turn)) {
       console.log("Invalid move!");
-      this.playTurn();
+      this.playTurn(callback);
       return;
     }
 
